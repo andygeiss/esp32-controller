@@ -16,7 +16,7 @@ Provide an API for mapping Golang into Arduino code, which can be used by [ESP T
 * [serial/println](https://www.arduino.cc/reference/en/language/functions/communication/serial/println/)
 * [time/delay](https://www.arduino.cc/reference/en/language/functions/time/delay/)
 * [WiFiBSSID](https://www.arduino.cc/en/Reference/WiFiBSSID)
-* [WiFiBegin](ttps://www.arduino.cc/en/Reference/WiFiBegin)
+* [WiFiBegin](https://www.arduino.cc/en/Reference/WiFiBegin)
 * [WiFiDisconnect](https://www.arduino.cc/en/Reference/WiFiDisconnect)
 * [WiFiEncryptionType](https://www.arduino.cc/en/Reference/WiFiEncryptionType)
 * [WiFiLocalIP](https://www.arduino.cc/en/Reference/WiFiLocalIP)
