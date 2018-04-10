@@ -1,11 +1,9 @@
-package digital
+package digital_test
 
 import (
-	"testing"
-
 	. "github.com/andygeiss/assert"
-
-	"github.com/andygeiss/esp32/business/controller/digital"
+	"github.com/andygeiss/esp32-controller/digital"
+	"testing"
 )
 
 func TestDigitalWrite(t *testing.T) {

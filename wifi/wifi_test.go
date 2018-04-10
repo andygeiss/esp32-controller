@@ -1,11 +1,9 @@
-package wifi
+package wifi_test
 
 import (
-	"testing"
-
 	. "github.com/andygeiss/assert"
-
-	"github.com/andygeiss/esp32/business/controller/wifi"
+	"github.com/andygeiss/esp32-controller/wifi"
+	"testing"
 )
 
 func TestWifiBegin(t *testing.T) {
