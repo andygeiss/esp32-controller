@@ -10,11 +10,6 @@ type IPAddress struct {
 	d int
 }
 
-// NewIPv4Address ...
-func NewIPv4Address(a, b, c, d int) *IPAddress {
-	return &IPAddress{a, b, c, d}
-}
-
 const (
 	// EncryptionTypeAuto ...
 	EncryptionTypeAuto = 8
