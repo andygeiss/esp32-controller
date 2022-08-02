@@ -1,9 +1,10 @@
 package random_test
 
 import (
-	"github.com/andygeiss/assert"
-	"github.com/andygeiss/esp32-controller/random"
 	"testing"
+
+	"github.com/andygeiss/esp32-controller/random"
+	"github.com/andygeiss/utils/assert"
 )
 
 func TestNum(t *testing.T) {

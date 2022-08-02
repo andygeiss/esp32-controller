@@ -1,9 +1,10 @@
 package serial_test
 
 import (
-	"github.com/andygeiss/assert"
-	"github.com/andygeiss/esp32-controller/serial"
 	"testing"
+
+	"github.com/andygeiss/esp32-controller/serial"
+	"github.com/andygeiss/utils/assert"
 )
 
 func TestSerialBegin(t *testing.T) {
