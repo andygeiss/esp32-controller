@@ -2,6 +2,7 @@
 
 [![](https://img.shields.io/github/license/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller/blob/master/LICENSE)
 [![](https://img.shields.io/github/v/release/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller/releases)
+[![](https://img.shields.io/codeclimate/maintainability/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller)
 [![](https://img.shields.io/codeclimate/tech-debt/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller)
 [![](https://goreportcard.com/badge/github.com/andygeiss/esp32-controller)](https://goreportcard.com/report/github.com/andygeiss/esp32-controller)
 [![BCH compliance](https://bettercodehub.com/edge/badge/andygeiss/esp32-controller?branch=master)](https://bettercodehub.com/)
