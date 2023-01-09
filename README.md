@@ -4,7 +4,6 @@
 [![](https://img.shields.io/github/v/release/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller/releases)
 [![](https://img.shields.io/github/go-mod/go-version/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller)
 [![](https://goreportcard.com/badge/github.com/andygeiss/esp32-controller)](https://goreportcard.com/report/github.com/andygeiss/esp32-controller)
-[![BCH compliance](https://bettercodehub.com/edge/badge/andygeiss/esp32-controller?branch=master)](https://bettercodehub.com/)
 
 Provide an API for mapping Golang into Arduino code, which can be used by [ESP Transpiler](https://github.com/andygeiss/esp32-transpiler)
 
