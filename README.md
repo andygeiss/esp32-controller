@@ -1,9 +1,9 @@
 # ESP32 Controller
 
-[![](https://img.shields.io/github/license/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller/blob/master/LICENSE)
-[![](https://img.shields.io/github/v/release/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller/releases)
-[![](https://img.shields.io/github/go-mod/go-version/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller)
-[![](https://goreportcard.com/badge/github.com/andygeiss/esp32-controller)](https://goreportcard.com/report/github.com/andygeiss/esp32-controller)
+[![License](https://img.shields.io/github/license/andygeiss/esp32)](https://github.com/andygeiss/esp32-controller/blob/master/LICENSE)
+[![Releases](https://img.shields.io/github/v/release/andygeiss/esp32)](https://github.com/andygeiss/esp32-controller/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/andygeiss/esp32)](https://goreportcard.com/report/github.com/andygeiss/esp32)
+[![Maintainability](https://api.codeclimate.com/v1/badges/3658b2bdb86b0c27ae20/maintainability)](https://codeclimate.com/github/andygeiss/esp32-controller/maintainability)
 
 Provide an API for mapping Golang into Arduino code, which can be used by [ESP Transpiler](https://github.com/andygeiss/esp32-transpiler)
 
