@@ -3,8 +3,8 @@ package digital_test
 import (
 	"testing"
 
+	"github.com/andygeiss/cloud-native-utils/assert"
 	"github.com/andygeiss/esp32-controller/digital"
-	"github.com/andygeiss/utils/assert"
 )
 
 func TestDigitalWrite(t *testing.T) {
@@ -12,7 +12,7 @@ func TestDigitalWrite(t *testing.T) {
 	digital.GPIOValues[pin] = digital.Low
 	digital.Write(pin, digital.High)
 	val := digital.GPIOValues[pin]
-	assert.That("val is set to high", t, val, digital.High)
+	assert.That(t, "val is set to high", val, digital.High)
 }
 
 func TestPinMode(t *testing.T) {
@@ -20,5 +20,5 @@ func TestPinMode(t *testing.T) {
 	digital.GPIOModes[pin] = digital.ModeInput
 	digital.PinMode(pin, digital.ModeOutput)
 	mode := digital.GPIOModes[pin]
-	assert.That("mode is set to output", t, mode, digital.ModeOutput)
+	assert.That(t, "mode is set to output", mode, digital.ModeOutput)
 }
