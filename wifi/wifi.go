@@ -1,8 +1,16 @@
+// Package wifi joins the ESP32 to a WiFi network and opens connections over it.
+//
+// [Begin] joins an open network and [BeginEncrypted] joins a protected one; both
+// leave the result in [Status]. [Client] then opens a connection to a server.
+//
+// Network state lives in the Current* variables, the way an Arduino sketch keeps
+// it in globals. Nothing here is safe to use from more than one goroutine.
+//
+// See https://www.arduino.cc/en/Reference/WiFi
 package wifi
 
-// @see: https://www.arduino.cc/en/Reference/WiFi
-
-// IPAddress ...
+// IPAddress is an IPv4 address, one field per dotted part: 127.0.0.1 is
+// {127, 0, 0, 1}.
 type IPAddress struct {
 	A int
 	B int
@@ -10,133 +18,144 @@ type IPAddress struct {
 	D int
 }
 
+// How a network protects itself, as [EncryptionType] reports it.
 const (
-	// EncryptionTypeAuto ...
 	EncryptionTypeAuto = 8
-	// EncryptionTypeCCMP ...
 	EncryptionTypeCCMP = 4
-	// EncryptionTypeNone ...
 	EncryptionTypeNone = 7
-	// EncryptionTypeTKIP ...
 	EncryptionTypeTKIP = 2
-	// EncryptionTypeWEP ...
-	EncryptionTypeWEP = 5
-	// MaxSocketNum ...
-	MaxSocketNum = 4096
-	// StatusConnected ...
-	StatusConnected = 3
-	// StatusConnectionLost ...
-	StatusConnectionLost = 4
-	// StatusConnectFailed ...
-	StatusConnectFailed = 5
-	// StatusDisconnected ...
-	StatusDisconnected = 6
-	// StatusIdle ...
-	StatusIdle = 0
-	// StatusNoShield ...
-	StatusNoShield = 255
-	// StatusNoSSIDAvailable ...
-	StatusNoSSIDAvailable = 1
-	// StatusScanCompleted ...
-	StatusScanCompleted = 2
+	EncryptionTypeWEP  = 5
 )
 
+// Where the board stands with the network, as [Status] reports it.
+const (
+	StatusConnected       = 3
+	StatusConnectionLost  = 4
+	StatusConnectFailed   = 5
+	StatusDisconnected    = 6
+	StatusIdle            = 0
+	StatusNoShield        = 255
+	StatusNoSSIDAvailable = 1
+	StatusScanCompleted   = 2
+)
+
+// MaxSocketNum is how many connections the board tracks at once.
+const MaxSocketNum = 4096
+
 var (
-	// CurrentBSSID ...
+	// CurrentBSSID is the MAC address [BSSID] reports.
 	CurrentBSSID = []int{0, 0, 0, 0, 0, 0, 0, 0}
-	// CurrentDNS ...
+	// CurrentDNS is the name server [SetDNS] last set.
 	CurrentDNS = []int{0, 0, 0, 0}
-	// CurrentEncryptionType ...
-	CurrentEncryptionType = 7
-	// CurrentGateway ...
+	// CurrentEncryptionType is the protection [EncryptionType] reports.
+	CurrentEncryptionType = EncryptionTypeNone
+	// CurrentGateway is the router the board sends other traffic through.
 	CurrentGateway = &IPAddress{127, 0, 0, 255}
-	// CurrentLocalIP ...
+	// CurrentLocalIP is the board's own address, as [LocalIP] reports it.
 	CurrentLocalIP = &IPAddress{127, 0, 0, 1}
-	// CurrentNetworks ...
+	// CurrentNetworks is the count [ScanNetworks] reports.
 	CurrentNetworks = 0
-	// CurrentRSSI ...
+	// CurrentRSSI is the signal strength [RSSI] reports, in decibels.
 	CurrentRSSI = -1
-	// CurrentSSID ...
+	// CurrentSSID is the network name [SSID] reports.
 	CurrentSSID = ""
-	// CurrentStatus ...
+	// CurrentStatus is the value [Status] reports.
 	CurrentStatus = StatusIdle
-	// SocketPort ...
+	// SocketPort holds the port each open connection uses.
 	SocketPort = make(map[int]int, MaxSocketNum)
-	// SocketState ...
+	// SocketState holds how far along each open connection is.
 	SocketState = make(map[int]int, MaxSocketNum)
 )
 
-// BSSID gets the MAC address of the routher you are connected to.
-// @see: https://www.arduino.cc/en/Reference/WiFiBSSID
+// BSSID returns the MAC address of the router the board is joined to.
+//
+// See https://www.arduino.cc/en/Reference/WiFiBSSID
 func BSSID() []int {
 	return CurrentBSSID
 }
 
-// Begin initializes the WiFi library's network settings and provides the current status.
-// @see: https://www.arduino.cc/en/Reference/WiFiBegin
+// Begin joins the open network named ssid. Read [Status] for the result.
+//
+// See https://www.arduino.cc/en/Reference/WiFiBegin
 func Begin(ssid string) {
 	CurrentRSSI = 0
 	CurrentSSID = ssid
 	CurrentStatus = StatusConnected
 }
 
-// BeginEncrypted initializes the WiFi library's network settings and provides the current status.
-// @see: https://www.arduino.cc/en/Reference/WiFiBegin
+// BeginEncrypted joins the protected network named ssid using passphrase.
+// Read [Status] for the result.
+//
+// See https://www.arduino.cc/en/Reference/WiFiBegin
 func BeginEncrypted(ssid, passphrase string) {
 	CurrentRSSI = 0
 	CurrentSSID = ssid
 	CurrentStatus = StatusConnected
 }
 
-// Disconnect disconnects the WiFi shield from the current network.
-// @see: https://www.arduino.cc/en/Reference/WiFiDisconnect
+// Disconnect leaves the current network, putting [Status] back to StatusIdle.
+//
+// See https://www.arduino.cc/en/Reference/WiFiDisconnect
 func Disconnect() {
 	CurrentStatus = StatusIdle
 }
 
-// EncryptionType gets the encryption type of the current network.
-// @see: https://www.arduino.cc/en/Reference/WiFiEncryptionType
+// EncryptionType returns how the current network protects itself, as one of the
+// EncryptionType constants.
+//
+// See https://www.arduino.cc/en/Reference/WiFiEncryptionType
 func EncryptionType() int {
 	return CurrentEncryptionType
 }
 
-// HostByName ...
+// HostByName looks hostname up and returns 1 when it resolved. The board writes
+// the address into addr; this Go version cannot, because addr is a copy.
+//
+// See https://www.arduino.cc/en/Reference/WiFiHostByName
 func HostByName(hostname string, addr string) int {
 	return 0
 }
 
-// LocalIP gets the WiFi shield's IP address.
-// @see: https://www.arduino.cc/en/Reference/WiFiLocalIP
+// LocalIP returns the board's own address on the network.
+//
+// See https://www.arduino.cc/en/Reference/WiFiLocalIP
 func LocalIP() *IPAddress {
 	return CurrentLocalIP
 }
 
-// RSSI gets the signal strength of the connection to the router.
-// @see: https://www.arduino.cc/en/Reference/WiFiRSSI
+// RSSI returns the signal strength to the router in decibels. It is negative,
+// and closer to zero is stronger.
+//
+// See https://www.arduino.cc/en/Reference/WiFiRSSI
 func RSSI() int {
 	return CurrentRSSI
 }
 
-// ScanNetworks scans for available WiFi networks and returns the discovered number.
-// @see: https://www.arduino.cc/en/Reference/WiFiScanNetworks
+// ScanNetworks looks for networks in range and returns how many it found.
+//
+// See https://www.arduino.cc/en/Reference/WiFiScanNetworks
 func ScanNetworks() int {
 	return CurrentNetworks
 }
 
-// SetDNS allows you to configure the DNS (Domain Name System) server.
-// @see: https://www.arduino.cc/en/Reference/WiFiSetDns
+// SetDNS points the board at the name server dns, one field per dotted part.
+//
+// See https://www.arduino.cc/en/Reference/WiFiSetDns
 func SetDNS(dns []int) {
 	CurrentDNS = dns
 }
 
-// Status returns the connection status.
-// @see: https://www.arduino.cc/en/Reference/WiFiStatus
+// Status returns where the board stands with the network, as one of the Status
+// constants.
+//
+// See https://www.arduino.cc/en/Reference/WiFiStatus
 func Status() int {
 	return CurrentStatus
 }
 
-// SSID gets the SSID of the current network.
-// @see: https://www.arduino.cc/en/Reference/WiFiSSID
+// SSID returns the name of the network the board is joined to.
+//
+// See https://www.arduino.cc/en/Reference/WiFiSSID
 func SSID() string {
 	return CurrentSSID
 }
