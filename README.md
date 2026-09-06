@@ -103,9 +103,9 @@ are waived on the record:
   ([project-types/library.md](https://github.com/andygeiss/baseline/blob/main/project-types/library.md))
   — waived 2026-09-06 by Andy. An Arduino sketch keeps pin and network state in globals,
   and the transpiler maps these onto them. Scoped to the exported variables in `digital`
-  (`GPIOModes`, `GPIOValues`), `serial` (`AvailableN`, `Baud`) and `wifi` (`Current*`,
-  `Socket*`); no other package holds state, and none of it is safe to touch from more
-  than one goroutine, which the package docs say.
+  (`GPIOModes`, `GPIOValues`), `serial` (`AvailableN`, `Baud`) and `wifi` (`Current*`);
+  no other package holds state, and none of it is safe to touch from more than one
+  goroutine, which the package docs say.
 
 - **`context.Context` first on anything that blocks**
   ([stack/go.md](https://github.com/andygeiss/baseline/blob/main/stack/go.md))

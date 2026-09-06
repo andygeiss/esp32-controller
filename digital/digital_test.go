@@ -13,9 +13,10 @@ func TestIsPinValid(t *testing.T) {
 		want bool
 	}{
 		{"a pin in the middle is valid", 1, true},
+		// GPIO 0 is a real pin, and the sketch's pinMode(0, ...) acts on it.
+		{"the lowest pin is valid", 0, true},
 		{"the highest pin is valid", digital.PinsMax, true},
 		{"one past the highest is not", digital.PinsMax + 1, false},
-		{"zero is not", 0, false},
 		{"a negative pin is not", -1, false},
 	}
 	for _, tt := range tests {
@@ -56,7 +57,7 @@ func TestWrite(t *testing.T) {
 }
 
 func TestWriteIgnoresAnInvalidPin(t *testing.T) {
-	pin := 0
+	pin := -1
 	delete(digital.GPIOValues, pin)
 	digital.Write(pin, digital.High)
 	if _, ok := digital.GPIOValues[pin]; ok {

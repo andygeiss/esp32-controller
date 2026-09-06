@@ -27,6 +27,9 @@ func TestNumBetweenStaysInRange(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// -shuffle=on leaves the generator wherever the last test did, and
+			// the coverage check below is only sound from a known start.
+			random.Seed(1)
 			low, high := tt.max, tt.min
 			for range 1000 {
 				got := random.NumBetween(tt.min, tt.max)

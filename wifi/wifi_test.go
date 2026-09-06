@@ -44,7 +44,7 @@ func TestDisconnect(t *testing.T) {
 }
 
 func TestBSSID(t *testing.T) {
-	want := []int{1, 2, 3, 4, 5, 6, 7, 8}
+	want := []int{1, 2, 3, 4, 5, 6}
 	wifi.CurrentBSSID = want
 	if got := wifi.BSSID(); !slices.Equal(got, want) {
 		t.Errorf("BSSID() = %v, want %v", got, want)
@@ -66,6 +66,13 @@ func TestLocalIP(t *testing.T) {
 	}
 }
 
+func TestIPAddressString(t *testing.T) {
+	addr := wifi.IPAddress{A: 192, B: 168, C: 0, D: 10}
+	if got := addr.String(); got != "192.168.0.10" {
+		t.Errorf("String() = %q, want %q", got, "192.168.0.10")
+	}
+}
+
 func TestScanNetworks(t *testing.T) {
 	wifi.CurrentNetworks = 3
 	if got := wifi.ScanNetworks(); got != 3 {
@@ -82,10 +89,36 @@ func TestSetDNS(t *testing.T) {
 	}
 }
 
-func TestHostByNameAlwaysFails(t *testing.T) {
-	// The real lookup only happens in the generated sketch, so the Go side
-	// reports failure rather than pretending it resolved.
-	if got := wifi.HostByName("example.com", ""); got != 0 {
-		t.Errorf("HostByName() = %d, want 0", got)
+// TestConstantsMatchArduino pins each constant to the number the board reports.
+// The transpiler emits the C++ name, so only this test catches a value that
+// drifts from Arduino's wl_status_t and wl_enc_type — as StatusConnectFailed
+// and StatusConnectionLost had, swapped with each other.
+func TestConstantsMatchArduino(t *testing.T) {
+	tests := []struct {
+		name string
+		got  int
+		want int
+	}{
+		{"WL_IDLE_STATUS", wifi.StatusIdle, 0},
+		{"WL_NO_SSID_AVAIL", wifi.StatusNoSSIDAvailable, 1},
+		{"WL_SCAN_COMPLETED", wifi.StatusScanCompleted, 2},
+		{"WL_CONNECTED", wifi.StatusConnected, 3},
+		{"WL_CONNECT_FAILED", wifi.StatusConnectFailed, 4},
+		{"WL_CONNECTION_LOST", wifi.StatusConnectionLost, 5},
+		{"WL_DISCONNECTED", wifi.StatusDisconnected, 6},
+		{"WL_NO_SHIELD", wifi.StatusNoShield, 255},
+		{"ENC_TYPE_TKIP", wifi.EncryptionTypeTKIP, 2},
+		{"ENC_TYPE_CCMP", wifi.EncryptionTypeCCMP, 4},
+		{"ENC_TYPE_WEP", wifi.EncryptionTypeWEP, 5},
+		{"ENC_TYPE_NONE", wifi.EncryptionTypeNone, 7},
+		{"ENC_TYPE_AUTO", wifi.EncryptionTypeAuto, 8},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if tt.got != tt.want {
+				t.Errorf("%s = %d, want %d", tt.name, tt.got, tt.want)
+			}
+		})
 	}
 }

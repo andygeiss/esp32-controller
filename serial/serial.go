@@ -28,7 +28,9 @@ const (
 )
 
 var (
-	// AvailableN is the number of bytes [Available] reports as waiting.
+	// AvailableN is the number of bytes [Available] reports as waiting. Nothing
+	// in this package puts bytes there; set it to stand in for input the board
+	// would have received.
 	AvailableN = 0
 	// Baud is the speed [Begin] last set, or 0 before the first call.
 	Baud = 0
@@ -42,11 +44,10 @@ func Available() int {
 }
 
 // Begin opens the port at baud bits per second. Pass one of the BaudRate
-// constants.
+// constants. Opening the port receives nothing, so it leaves [AvailableN] alone.
 //
 // See https://www.arduino.cc/reference/en/language/functions/communication/serial/begin/
 func Begin(baud int) {
-	AvailableN = 1
 	Baud = baud
 }
 
@@ -57,8 +58,8 @@ func Print(val any) {
 	fmt.Print(val)
 }
 
-// Println sends val as readable text, followed by a carriage return and a
-// newline.
+// Println sends val as readable text, followed by a newline. The sketch's
+// Serial.println sends a carriage return and a newline.
 //
 // See https://www.arduino.cc/reference/en/language/functions/communication/serial/println/
 func Println(val any) {

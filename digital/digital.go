@@ -23,14 +23,15 @@ const (
 
 var (
 	// GPIOModes holds the mode [PinMode] last set, per pin.
-	GPIOModes = make(map[int]int, PinsMax)
+	GPIOModes = make(map[int]int, PinsMax+1)
 	// GPIOValues holds the value [Write] last set, per pin.
-	GPIOValues = make(map[int]int, PinsMax)
+	GPIOValues = make(map[int]int, PinsMax+1)
 )
 
-// IsPinValid reports whether pin is a pin number this package acts on.
+// IsPinValid reports whether pin is a pin number this package acts on: GPIO 0
+// up to and including [PinsMax].
 func IsPinValid(pin int) bool {
-	return pin <= PinsMax && pin > 0
+	return pin >= 0 && pin <= PinsMax
 }
 
 // PinMode sets pin to read a voltage (ModeInput) or drive one (ModeOutput).

@@ -1,13 +1,16 @@
 // Package wifi joins the ESP32 to a WiFi network and opens connections over it.
 //
 // [Begin] joins an open network and [BeginEncrypted] joins a protected one; both
-// leave the result in [Status]. [Client] then opens a connection to a server.
+// leave the result in [Status]. [Client.Connect] then opens a connection to a
+// server.
 //
 // Network state lives in the Current* variables, the way an Arduino sketch keeps
 // it in globals. Nothing here is safe to use from more than one goroutine.
 //
 // See https://www.arduino.cc/en/Reference/WiFi
 package wifi
+
+import "fmt"
 
 // IPAddress is an IPv4 address, one field per dotted part: 127.0.0.1 is
 // {127, 0, 0, 1}.
@@ -18,7 +21,14 @@ type IPAddress struct {
 	D int
 }
 
-// How a network protects itself, as [EncryptionType] reports it.
+// String returns the address in dotted form, so serial.Println(wifi.LocalIP())
+// prints what the sketch's Serial.println(WiFi.localIP()) prints.
+func (a IPAddress) String() string {
+	return fmt.Sprintf("%d.%d.%d.%d", a.A, a.B, a.C, a.D)
+}
+
+// How a network protects itself, as [EncryptionType] reports it. The numbers are
+// Arduino's wl_enc_type.
 const (
 	EncryptionTypeAuto = 8
 	EncryptionTypeCCMP = 4
@@ -27,11 +37,12 @@ const (
 	EncryptionTypeWEP  = 5
 )
 
-// Where the board stands with the network, as [Status] reports it.
+// Where the board stands with the network, as [Status] reports it. The numbers
+// are Arduino's wl_status_t, so a sketch and this package agree.
 const (
 	StatusConnected       = 3
-	StatusConnectionLost  = 4
-	StatusConnectFailed   = 5
+	StatusConnectFailed   = 4
+	StatusConnectionLost  = 5
 	StatusDisconnected    = 6
 	StatusIdle            = 0
 	StatusNoShield        = 255
@@ -39,18 +50,13 @@ const (
 	StatusScanCompleted   = 2
 )
 
-// MaxSocketNum is how many connections the board tracks at once.
-const MaxSocketNum = 4096
-
 var (
-	// CurrentBSSID is the MAC address [BSSID] reports.
-	CurrentBSSID = []int{0, 0, 0, 0, 0, 0, 0, 0}
+	// CurrentBSSID is the MAC address [BSSID] reports, one field per octet.
+	CurrentBSSID = []int{0, 0, 0, 0, 0, 0}
 	// CurrentDNS is the name server [SetDNS] last set.
 	CurrentDNS = []int{0, 0, 0, 0}
 	// CurrentEncryptionType is the protection [EncryptionType] reports.
 	CurrentEncryptionType = EncryptionTypeNone
-	// CurrentGateway is the router the board sends other traffic through.
-	CurrentGateway = &IPAddress{127, 0, 0, 255}
 	// CurrentLocalIP is the board's own address, as [LocalIP] reports it.
 	CurrentLocalIP = &IPAddress{127, 0, 0, 1}
 	// CurrentNetworks is the count [ScanNetworks] reports.
@@ -61,13 +67,10 @@ var (
 	CurrentSSID = ""
 	// CurrentStatus is the value [Status] reports.
 	CurrentStatus = StatusIdle
-	// SocketPort holds the port each open connection uses.
-	SocketPort = make(map[int]int, MaxSocketNum)
-	// SocketState holds how far along each open connection is.
-	SocketState = make(map[int]int, MaxSocketNum)
 )
 
-// BSSID returns the MAC address of the router the board is joined to.
+// BSSID returns the MAC address of the router the board is joined to, one
+// field per octet.
 //
 // See https://www.arduino.cc/en/Reference/WiFiBSSID
 func BSSID() []int {
@@ -108,14 +111,6 @@ func EncryptionType() int {
 	return CurrentEncryptionType
 }
 
-// HostByName looks hostname up and returns 1 when it resolved. The board writes
-// the address into addr; this Go version cannot, because addr is a copy.
-//
-// See https://www.arduino.cc/en/Reference/WiFiHostByName
-func HostByName(hostname string, addr string) int {
-	return 0
-}
-
 // LocalIP returns the board's own address on the network.
 //
 // See https://www.arduino.cc/en/Reference/WiFiLocalIP
@@ -123,8 +118,8 @@ func LocalIP() *IPAddress {
 	return CurrentLocalIP
 }
 
-// RSSI returns the signal strength to the router in decibels. It is negative,
-// and closer to zero is stronger.
+// RSSI returns the signal strength to the router in decibels. Closer to zero
+// is stronger.
 //
 // See https://www.arduino.cc/en/Reference/WiFiRSSI
 func RSSI() int {
