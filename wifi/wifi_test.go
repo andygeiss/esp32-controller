@@ -1,46 +1,91 @@
 package wifi_test
 
 import (
+	"slices"
 	"testing"
 
-	"github.com/andygeiss/cloud-native-utils/assert"
 	"github.com/andygeiss/esp32-controller/wifi"
 )
 
-func TestWifiBegin(t *testing.T) {
-	ssid := "test"
-	wifi.CurrentStatus = wifi.StatusIdle
-	wifi.Begin(ssid)
-	assert.That(t, "current status is connected", wifi.CurrentStatus, wifi.StatusConnected)
-}
-
-func TestWifiBeginEncrypted(t *testing.T) {
-	ssid := "test"
-	passphrase := "passphrase"
-	ipv4 := &wifi.IPAddress{127, 0, 0, 1}
-	wifi.CurrentStatus = wifi.StatusIdle
-	wifi.BeginEncrypted(ssid, passphrase)
-	assert.That(t, "current status is connected", wifi.CurrentStatus, wifi.StatusConnected)
-	assert.That(t, "current local ip is ipv4", wifi.CurrentLocalIP, ipv4)
-}
-func TestWifiDisconnect(t *testing.T) {
-	ssid := "test"
-	wifi.CurrentStatus = wifi.StatusIdle
-	wifi.Begin(ssid)  // StatusConnected
-	wifi.Disconnect() // back to idle?
-	assert.That(t, "current status is idle", wifi.CurrentStatus, wifi.StatusIdle)
-}
-
-func TestWifiRSSIShouldBeNotMinusOne(t *testing.T) {
-	ssid := "test"
+func TestBegin(t *testing.T) {
 	wifi.CurrentRSSI = -1
-	wifi.Begin(ssid)
-	assert.That(t, "RSSI is set to 0", wifi.RSSI(), 0)
+	wifi.CurrentSSID = ""
+	wifi.CurrentStatus = wifi.StatusIdle
+	wifi.Begin("test")
+	if got := wifi.Status(); got != wifi.StatusConnected {
+		t.Errorf("Status() = %d, want %d", got, wifi.StatusConnected)
+	}
+	if got := wifi.SSID(); got != "test" {
+		t.Errorf("SSID() = %q, want %q", got, "test")
+	}
+	if got := wifi.RSSI(); got != 0 {
+		t.Errorf("RSSI() = %d, want 0", got)
+	}
 }
 
-func TestWifiSSIDShouldNotBeEmpty(t *testing.T) {
-	ssid := "test"
+func TestBeginEncrypted(t *testing.T) {
 	wifi.CurrentSSID = ""
-	wifi.Begin(ssid)
-	assert.That(t, "SSID is set to test", wifi.SSID(), "test")
+	wifi.CurrentStatus = wifi.StatusIdle
+	wifi.BeginEncrypted("test", "passphrase")
+	if got := wifi.Status(); got != wifi.StatusConnected {
+		t.Errorf("Status() = %d, want %d", got, wifi.StatusConnected)
+	}
+	if got := wifi.SSID(); got != "test" {
+		t.Errorf("SSID() = %q, want %q", got, "test")
+	}
+}
+
+func TestDisconnect(t *testing.T) {
+	wifi.Begin("test")
+	wifi.Disconnect()
+	if got := wifi.Status(); got != wifi.StatusIdle {
+		t.Errorf("Status() = %d, want %d", got, wifi.StatusIdle)
+	}
+}
+
+func TestBSSID(t *testing.T) {
+	want := []int{1, 2, 3, 4, 5, 6, 7, 8}
+	wifi.CurrentBSSID = want
+	if got := wifi.BSSID(); !slices.Equal(got, want) {
+		t.Errorf("BSSID() = %v, want %v", got, want)
+	}
+}
+
+func TestEncryptionType(t *testing.T) {
+	wifi.CurrentEncryptionType = wifi.EncryptionTypeCCMP
+	if got := wifi.EncryptionType(); got != wifi.EncryptionTypeCCMP {
+		t.Errorf("EncryptionType() = %d, want %d", got, wifi.EncryptionTypeCCMP)
+	}
+}
+
+func TestLocalIP(t *testing.T) {
+	want := wifi.IPAddress{A: 192, B: 168, C: 0, D: 10}
+	wifi.CurrentLocalIP = &want
+	if got := wifi.LocalIP(); *got != want {
+		t.Errorf("LocalIP() = %v, want %v", *got, want)
+	}
+}
+
+func TestScanNetworks(t *testing.T) {
+	wifi.CurrentNetworks = 3
+	if got := wifi.ScanNetworks(); got != 3 {
+		t.Errorf("ScanNetworks() = %d, want 3", got)
+	}
+}
+
+func TestSetDNS(t *testing.T) {
+	want := []int{8, 8, 8, 8}
+	wifi.CurrentDNS = nil
+	wifi.SetDNS(want)
+	if !slices.Equal(wifi.CurrentDNS, want) {
+		t.Errorf("CurrentDNS = %v, want %v", wifi.CurrentDNS, want)
+	}
+}
+
+func TestHostByNameAlwaysFails(t *testing.T) {
+	// The real lookup only happens in the generated sketch, so the Go side
+	// reports failure rather than pretending it resolved.
+	if got := wifi.HostByName("example.com", ""); got != 0 {
+		t.Errorf("HostByName() = %d, want 0", got)
+	}
 }

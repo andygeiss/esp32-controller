@@ -3,20 +3,25 @@ package serial_test
 import (
 	"testing"
 
-	"github.com/andygeiss/cloud-native-utils/assert"
 	"github.com/andygeiss/esp32-controller/serial"
 )
 
-func TestSerialAvailable(t *testing.T) {
-	available := serial.Available()
-	assert.That(t, "available must be 0", available, 0)
+func TestAvailable(t *testing.T) {
+	// Begin sets AvailableN, and -shuffle=on may have run its test first.
+	serial.AvailableN = 0
+	if got := serial.Available(); got != 0 {
+		t.Errorf("Available() = %d, want 0", got)
+	}
 }
 
-func TestSerialBegin(t *testing.T) {
-	baud := serial.BaudRate115200
+func TestBegin(t *testing.T) {
+	serial.AvailableN = 0
 	serial.Baud = 0
-	serial.Begin(baud)
-	available := serial.Available()
-	assert.That(t, "baud rate is 115200", serial.Baud, serial.BaudRate115200)
-	assert.That(t, "available must be 1", available, 1)
+	serial.Begin(serial.BaudRate115200)
+	if serial.Baud != serial.BaudRate115200 {
+		t.Errorf("Baud = %d, want %d", serial.Baud, serial.BaudRate115200)
+	}
+	if got := serial.Available(); got != 1 {
+		t.Errorf("Available() = %d, want 1", got)
+	}
 }
