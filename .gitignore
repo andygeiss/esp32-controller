@@ -1,3 +1,2 @@
+# go test -coverprofile output, when run by hand; there is no coverage target.
 .coverprofile.out
-bin
-testdata
