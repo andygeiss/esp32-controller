@@ -3,7 +3,6 @@
 [![License](https://img.shields.io/github/license/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller/blob/master/LICENSE)
 [![Releases](https://img.shields.io/github/v/release/andygeiss/esp32-controller)](https://github.com/andygeiss/esp32-controller/releases)
 [![Go Reference](https://pkg.go.dev/badge/github.com/andygeiss/esp32-controller.svg)](https://pkg.go.dev/github.com/andygeiss/esp32-controller)
-[![Go Report Card](https://goreportcard.com/badge/github.com/andygeiss/esp32-controller)](https://goreportcard.com/report/github.com/andygeiss/esp32-controller)
 
 Write an ESP32 program in Go, and let
 [esp32-transpiler](https://github.com/andygeiss/esp32-transpiler) turn it into an Arduino
